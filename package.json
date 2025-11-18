@@ -10,6 +10,7 @@
     "migrate:positions": "node scripts/migrate_race_results.mjs"
   },
   "dependencies": {
+    "@next/third-parties": "^16.0.3",
     "dotenv": "^16.4.7",
     "fs": "^0.0.1-security",
     "fs-extra": "^11.3.1",

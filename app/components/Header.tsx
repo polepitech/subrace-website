@@ -19,7 +19,7 @@ export default function Header({
           <img src='/logo_V2.png' className='w-40 md:w-48 lg:w-56 relative z-[-1]' alt="Logo" />
         </div>
       </div>
-      <h1 className="mt-2 text-3xl md:text-4xl lg:text-5xl font-black tracking-tight text-white">
+      <h1 className="mt-2 text-xl md:text-4xl lg:text-5xl font-black tracking-tight text-white uppercase drop-shadow-lg">
         {title}
       </h1>
     </header>
