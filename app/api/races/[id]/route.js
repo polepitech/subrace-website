@@ -1,0 +1,106 @@
+import mysql from 'mysql2/promise';
+import 'dotenv/config';
+
+export async function GET(request, { params }) {
+  try {
+    // Dans Next.js 16, params peut être une Promise
+    let resolvedParams = params;
+    if (params && typeof params.then === 'function') {
+      resolvedParams = await params;
+    }
+    const rawRaceId = resolvedParams.id;
+
+    // Validation stricte de raceId
+    const raceId = parseInt(rawRaceId, 10);
+    if (!raceId || raceId <= 0 || isNaN(raceId)) {
+      return new Response(JSON.stringify({ error: 'Invalid race ID' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Récupère les paramètres de pagination
+    const { searchParams } = new URL(request.url);
+    
+    // Validation stricte des paramètres de pagination
+    const rawOffset = searchParams.get('offset') || '0';
+    const rawLimit = searchParams.get('limit') || '25';
+    
+    // Valider et forcer les valeurs à être des entiers positifs
+    const offset = Math.max(0, parseInt(rawOffset, 10) || 0);
+    const limit = Math.max(1, Math.min(100, parseInt(rawLimit, 10) || 25)); // Limite max à 100
+    
+    const startPosition = offset + 1;
+    const endPosition = offset + limit;
+
+    const connection = await mysql.createConnection({
+      host: '127.0.0.1',
+      user: process.env.MYSQL_USER || 'root',
+      password: process.env.MYSQL_PASSWORD || '',
+      database: 'SubRace'
+    });
+
+    // Récupère les informations de la course
+    const [raceRows] = await connection.execute(
+      'SELECT * FROM races WHERE id = ?',
+      [raceId]
+    );
+
+    if (raceRows.length === 0) {
+      await connection.end();
+      return new Response(JSON.stringify({ error: 'Race not found' }), {
+        status: 404,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Calcule le total de positions pour cette course
+    const [countRows] = await connection.execute(`
+      SELECT COUNT(*) as total
+      FROM follower_positions
+      WHERE race_id = ?
+    `, [raceId]);
+    const total = countRows[0]?.total || 0;
+
+    // Récupère les positions pour cette course avec les usernames (paginé)
+    const [positionRows] = await connection.execute(`
+      SELECT 
+        fp.position,
+        fp.followers_id,
+        f.username
+      FROM follower_positions fp
+      INNER JOIN followers f ON fp.followers_id = f.id
+      WHERE fp.race_id = ? AND fp.position BETWEEN ? AND ?
+      ORDER BY fp.position
+    `, [raceId, startPosition, endPosition]);
+
+    await connection.end();
+
+    const race = raceRows[0];
+    const hasMore = offset + limit < total;
+
+    const result = {
+      ...race,
+      positions: positionRows,
+      total,
+      offset,
+      limit,
+      hasMore
+    };
+
+    return new Response(JSON.stringify(result), {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': process.env.ALLOWED_ORIGIN || '*',
+      },
+    });
+  } catch (error) {
+    console.error('Error fetching race:', error);
+    return new Response(JSON.stringify({ error: 'Database error' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+}
+

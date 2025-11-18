@@ -1,0 +1,98 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "notFound": "Not found",
+    "error": "Error",
+    "back": "Back"
+  },
+  "navbar": {
+    "home": "Home",
+    "races": "Races",
+    "leaderboard": "Leaderboard",
+    "about": "About"
+  },
+  "home": {
+    "title": "PODIUM",
+    "subtitle": "Global Leaderboard"
+  },
+  "races": {
+    "title": "Races",
+    "subtitle": "Race list",
+    "noData": "No data available for this race",
+    "results": "Race results",
+    "race": "Race",
+    "storedData": "stored data for this race"
+  },
+  "user": {
+    "title": "Statistics",
+    "notFound": "User not found",
+    "stats": {
+      "globalRank": "Global rank",
+      "totalRaces": "Races",
+      "totalPoints": "Total points",
+      "podiums": "Podiums",
+      "victories": "Victories",
+      "bestPosition": "Best position",
+      "averagePosition": "Average position"
+    },
+    "raceHistory": "Race history",
+    "noRaces": "No races participated",
+    "position": "Position",
+    "points": "pts",
+    "info": {
+      "title": "🚧 Important information:",
+      "limit": "I can currently only retrieve statistics for the top {limit} per race. Therefore, you may not be marked on some races if you finished beyond this position.",
+      "apology": "I apologize for this inconvenience. SubRace is an independent project that requires a lot of time and costs.",
+      "support": "If you would like to support the project, you can follow <link>this LINK</link>."
+    }
+  },
+  "search": {
+    "placeholder": "Search for a user...",
+    "noResults": "No results found"
+  },
+  "leaderboard": {
+    "loading": "Loading...",
+    "incompleteData": "⚠️ Incomplete data",
+    "incompleteDataDescription": "Only the podium is available for this race. Complete data is only counted from day 60 onwards."
+  },
+  "about": {
+    "title": "About SubRace",
+    "subtitle": "",
+    "description": {
+      "title": "What is SubRace?",
+      "text1": "SubRace is an Instagram project of marble races between my followers.",
+      "text2": "Every day, I collect and process race data to keep this platform up to date and accessible to everyone."
+    },
+    "costs": {
+      "title": "An independent project that costs money",
+      "text1": "SubRace is a 100% independent project developed and maintained by a single person. This project represents a significant investment in time and money:",
+      "text2": "Every month, I spend money on hosting, servers, development tools and platform maintenance. Without support, it becomes difficult to continue improving and maintaining this free service for the community."
+    },
+    "donation": {
+      "title": "Support the project",
+      "description": "Your contribution, even modest, helps me cover costs and continue developing SubRace for you.",
+      "button": "Make a donation",
+      "link": "https://buymeacoffee.com/subtorace4"
+    },
+    "contact": {
+      "title": "Contact & Social Media",
+      "instagram": {
+        "title": "Instagram",
+        "description": "Follow us for updates",
+        "link": "https://www.instagram.com/subrace_officiel"
+      },
+      "email": {
+        "title": "Collaboration",
+        "description": "Contact us to collaborate",
+        "address": "contact@subrace.fr",
+        "subject": "SubRace Collaboration"
+      }
+    },
+    "cta": {
+      "title": "Help SubRace continue",
+      "description": "Every donation counts and allows us to continue offering this free service to the entire community. Thank you for your support!",
+      "button": "Support the project"
+    }
+  }
+}
+

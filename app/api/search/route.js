@@ -1,0 +1,65 @@
+import mysql from 'mysql2/promise';
+import 'dotenv/config';
+
+export async function GET() {
+  try {
+    const connection = await mysql.createConnection({
+      host: '127.0.0.1',
+      user: process.env.MYSQL_USER || 'root',
+      password: process.env.MYSQL_PASSWORD || '',
+      database: 'SubRace'
+    });
+
+    // Récupère tous les utilisateurs avec leurs points totaux (sans pagination pour la recherche)
+    const [rows] = await connection.execute(`
+      SELECT 
+        f.id,
+        f.username,
+        SUM(CASE 
+          WHEN fp.position <= 10 THEN 
+            GREATEST(0, 40000 - fp.position) + 
+            CASE fp.position
+              WHEN 1 THEN 10000 
+              WHEN 2 THEN 7000 
+              WHEN 3 THEN 5000
+              WHEN 4 THEN 4000 
+              WHEN 5 THEN 3000 
+              WHEN 6 THEN 2000
+              WHEN 7 THEN 1500 
+              WHEN 8 THEN 1000 
+              WHEN 9 THEN 500
+              WHEN 10 THEN 250 
+              ELSE 0 
+            END
+          ELSE GREATEST(0, 40000 - fp.position)
+        END) as total_points
+      FROM followers f
+      INNER JOIN follower_positions fp ON f.id = fp.followers_id
+      GROUP BY f.id, f.username
+      ORDER BY total_points DESC, f.username ASC
+    `);
+
+    await connection.end();
+
+    const users = rows.map(row => ({
+      username: row.username,
+      img: `/api/images/avatars/${row.username.toLowerCase()}.jpg`,
+      point: parseInt(row.total_points) || 0
+    }));
+
+    return new Response(JSON.stringify(users), {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': process.env.ALLOWED_ORIGIN || '*',
+      },
+    });
+  } catch (error) {
+    console.error('Error fetching search data:', error);
+    return new Response(JSON.stringify({ error: 'Database error' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+}
+

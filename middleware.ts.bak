@@ -1,0 +1,19 @@
+import createMiddleware from 'next-intl/middleware';
+import { locales, defaultLocale } from './i18n';
+
+export default createMiddleware({
+  // Liste des locales supportées
+  locales,
+  
+  // Locale par défaut
+  defaultLocale,
+  
+  // Ne pas utiliser de préfixe de locale dans l'URL (toutes les routes utilisent la locale par défaut)
+  localePrefix: 'never'
+});
+
+export const config = {
+  // Matcher pour les routes à traiter (exclut les fichiers statiques, API, etc.)
+  matcher: ['/((?!api|_next|_vercel|.*\\..*).*)']
+};
+

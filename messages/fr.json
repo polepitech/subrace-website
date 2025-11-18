@@ -1,0 +1,98 @@
+{
+  "common": {
+    "loading": "Chargement...",
+    "notFound": "Non trouvé",
+    "error": "Erreur",
+    "back": "Retour"
+  },
+  "navbar": {
+    "home": "Accueil",
+    "races": "Courses",
+    "leaderboard": "Classement",
+    "about": "À propos"
+  },
+  "home": {
+    "title": "PODIUM",
+    "subtitle": "Classement Global"
+  },
+  "races": {
+    "title": "Courses",
+    "subtitle": "Liste des courses",
+    "noData": "Aucune donnée disponible pour cette course",
+    "results": "Résultats de la course",
+    "race": "Course",
+    "storedData": "données stockées pour cette course"
+  },
+  "user": {
+    "title": "Statistiques",
+    "notFound": "Utilisateur non trouvé",
+    "stats": {
+      "globalRank": "Rang global",
+      "totalRaces": "Courses",
+      "totalPoints": "Points totaux",
+      "podiums": "Podiums",
+      "victories": "Victoires",
+      "bestPosition": "Meilleure position",
+      "averagePosition": "Position moyenne"
+    },
+    "raceHistory": "Historique des courses",
+    "noRaces": "Aucune course participée",
+    "position": "Position",
+    "points": "pts",
+    "info": {
+      "title": "🚧 Information importante :",
+      "limit": "Je ne peux actuellement récupérer les statistiques que des {limit} premiers par course. Il est donc possible que vous ne soyez pas marqué sur certaines courses si vous avez terminé au-delà de cette position.",
+      "apology": "Je suis désolé pour ce désagrément. SubRace est un projet indépendant qui me demande énormément de temps et de coûts.",
+      "support": "Si vous souhaitez soutenir le projet, vous pouvez suivre <link>ce LIEN</link>."
+    }
+  },
+  "search": {
+    "placeholder": "Rechercher un utilisateur...",
+    "noResults": "Aucun résultat trouvé"
+  },
+  "leaderboard": {
+    "loading": "Chargement...",
+    "incompleteData": "⚠️ Données incomplètes",
+    "incompleteDataDescription": "Seul le podium est disponible pour cette course. Les données complètes ne sont compté qu'à partir du jour 60."
+  },
+  "about": {
+    "title": "À propos de SubRace",
+    "subtitle": "",
+    "description": {
+      "title": "Qu'est-ce que SubRace ?",
+      "text1": "SubRace est un projet instgram de course de bille entre mes followers. ",
+      "text2": "Chaque jour, je collecte et traite les données des courses pour maintenir cette plateforme à jour et accessible à tous."
+    },
+    "costs": {
+      "title": "Un projet indépendant qui coûte cher",
+      "text1": "SubRace est un projet 100% indépendant développé et maintenu par une seule personne. Ce projet représente un investissement important en temps et en argent :",
+      "text2": "Chaque mois, je dépense de l'argent pour l'hébergement, les serveurs, les outils de développement et la maintenance de la plateforme. Sans soutien, il devient difficile de continuer à améliorer et maintenir ce service gratuit pour la communauté."
+    },
+    "donation": {
+      "title": "Soutenez le projet",
+      "description": "Votre contribution, même modeste, m'aide à couvrir les coûts et à continuer à développer SubRace pour vous.",
+      "button": "Faire un don",
+      "link": "https://buymeacoffee.com/subtorace4"
+    },
+    "contact": {
+      "title": "Contact & Réseaux",
+      "instagram": {
+        "title": "Instagram",
+        "description": "Suivez-nous pour les actualités",
+        "link": "https://www.instagram.com/subrace_officiel"
+      },
+      "email": {
+        "title": "Collaboration",
+        "description": "Contactez-nous pour collaborer",
+        "address": "contact@subrace.fr",
+        "subject": "Collaboration SubRace"
+      }
+    },
+    "cta": {
+      "title": "Aidez SubRace à continuer",
+      "description": "Chaque don compte et nous permet de continuer à offrir ce service gratuit à toute la communauté. Merci pour votre soutien !",
+      "button": "Soutenir le projet"
+    }
+  }
+}
+
