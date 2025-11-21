@@ -20,6 +20,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "SubRace - Leaderboard",
   description: "SubRace leaderboard and statistics",
+  icons: {
+    icon: '/favicon.png',
+  },
 };
 
 export default async function RootLayout({
