@@ -68,41 +68,22 @@ export async function GET(request) {
       database: 'SubRace'
     });
 
-    // Calcule le total d'utilisateurs
+    // Calcule le total d'utilisateurs avec des points
     const [countRows] = await connection.execute(`
-      SELECT COUNT(DISTINCT f.id) as total
+      SELECT COUNT(*) as total
       FROM followers f
-      INNER JOIN follower_positions fp ON f.id = fp.followers_id
+      WHERE f.score > 0
     `);
     const total = countRows[0]?.total || 0;
 
-    // Récupère les utilisateurs avec leurs points totaux (avec pagination)
+    // Récupère les utilisateurs avec leurs scores (avec pagination)
     const [rows] = await connection.execute(`
       SELECT 
         f.id,
         f.username,
-        SUM(CASE 
-          WHEN fp.position <= 10 THEN 
-            GREATEST(0, 40000 - fp.position) + 
-            CASE fp.position
-              WHEN 1 THEN 10000 
-              WHEN 2 THEN 7000 
-              WHEN 3 THEN 5000
-              WHEN 4 THEN 4000 
-              WHEN 5 THEN 3000 
-              WHEN 6 THEN 2000
-              WHEN 7 THEN 1500 
-              WHEN 8 THEN 1000 
-              WHEN 9 THEN 500
-              WHEN 10 THEN 250 
-              ELSE 0 
-            END
-          ELSE GREATEST(0, 40000 - fp.position)
-        END) as total_points
+        f.score as total_points
       FROM followers f
-      INNER JOIN follower_positions fp ON f.id = fp.followers_id
-      GROUP BY f.id, f.username
-      ORDER BY total_points DESC, f.username ASC
+      ORDER BY f.score DESC, f.username ASC
       LIMIT ${limit} OFFSET ${offset}
     `);
 
