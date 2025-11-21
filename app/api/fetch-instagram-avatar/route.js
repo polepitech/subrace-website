@@ -43,8 +43,9 @@ export async function GET(request) {
     const otherProjectPath = process.env.SUBRACE_PROJECT_PATH || '/Users/pollux/Desktop/DEV/projets/SubRace';
     const npmScriptName = process.env.INSTAGRAM_AVATAR_NPM_SCRIPT || 'fetch:instagram-avatar';
     
-    // Validation supplémentaire des chemins et noms de scripts pour éviter l'injection
-    if (!/^[a-zA-Z0-9._-]+$/.test(npmScriptName)) {
+    // Validation supplémentaire des noms de scripts pour éviter l'injection
+    // Les scripts npm peuvent contenir des deux-points (:) comme dans "fetch:instagram-avatar"
+    if (!/^[a-zA-Z0-9._:-]+$/.test(npmScriptName)) {
       console.error(`[${new Date().toISOString()}] Nom de script npm invalide: ${npmScriptName}`);
       return new Response(JSON.stringify({ 
         error: 'Configuration invalide.' 

@@ -36,10 +36,12 @@ export default function HomePage() {
         setHasMore(leaderboardData.hasMore);
         setCurrentPage(0);
 
-        // Charge tous les utilisateurs pour la recherche
+        // Charge tous les utilisateurs pour la recherche (sans pagination = tous les utilisateurs)
         const searchResponse = await fetch('/api/search');
         const searchUsers = await searchResponse.json();
-        setAllUsers(searchUsers);
+        // Si pas de pagination, l'API retourne directement un tableau
+        // Sinon, c'est un objet { users, total, page, limit, hasMore }
+        setAllUsers(Array.isArray(searchUsers) ? searchUsers : (searchUsers.users || []));
       } catch (error) {
         console.error('Error fetching data:', error);
       } finally {

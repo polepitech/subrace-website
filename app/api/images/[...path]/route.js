@@ -1,9 +1,15 @@
 import fs from 'fs';
 import path from 'path';
 import 'dotenv/config';
+import { validateLocalhost, getLocalhostCorsHeaders } from '../../../utils/security';
 
 export async function GET(request, { params }) {
   try {
+    // Vérifier que la requête provient de localhost
+    const localhostError = validateLocalhost(request);
+    if (localhostError) {
+      return localhostError;
+    }
     // Récupérer le chemin depuis la variable d'environnement
     const imagesBasePath = process.env.IMAGES_PATH;
     
@@ -114,14 +120,21 @@ export async function GET(request, { params }) {
       headers: {
         'Content-Type': contentType,
         'Cache-Control': 'public, max-age=31536000, immutable',
-        'Access-Control-Allow-Origin': process.env.ALLOWED_ORIGIN || '*',
+        ...getLocalhostCorsHeaders(),
       },
     });
   } catch (error) {
     console.error('Error serving image:', error);
-    return new Response('Internal server error', {
+    const errorMessage = process.env.NODE_ENV === 'production' 
+      ? 'Internal server error'
+      : error.message;
+    
+    return new Response(errorMessage, {
       status: 500,
-      headers: { 'Content-Type': 'text/plain' },
+      headers: { 
+        'Content-Type': 'text/plain',
+        ...getLocalhostCorsHeaders(),
+      },
     });
   }
 }

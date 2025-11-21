@@ -1,18 +1,57 @@
 import mysql from 'mysql2/promise';
 import 'dotenv/config';
+import { validateLocalhost, getLocalhostCorsHeaders } from '../../utils/security';
 
 export async function GET(request) {
   try {
+    // Vérifier que la requête provient de localhost
+    const localhostError = validateLocalhost(request);
+    if (localhostError) {
+      return localhostError;
+    }
+
     const { searchParams } = new URL(request.url);
     
     // Validation stricte des paramètres de pagination
     const rawPage = searchParams.get('page') || '0';
     const rawLimit = searchParams.get('limit') || '25';
     
-    // Valider et forcer les valeurs à être des entiers positifs
-    const page = Math.max(0, parseInt(rawPage, 10) || 0);
-    const limit = Math.max(1, Math.min(100, parseInt(rawLimit, 10) || 25)); // Limite max à 100
+    // Validation stricte: s'assurer que les valeurs sont bien des entiers
+    // Utiliser Number.isInteger pour vérifier après parseInt
+    const parsedPage = parseInt(rawPage, 10);
+    const parsedLimit = parseInt(rawLimit, 10);
+    
+    // Vérifier que ce sont bien des entiers valides (pas NaN, pas de décimales)
+    if (isNaN(parsedPage) || isNaN(parsedLimit) || 
+        rawPage !== parsedPage.toString() || rawLimit !== parsedLimit.toString()) {
+      return new Response(JSON.stringify({ 
+        error: 'Invalid pagination parameters' 
+      }), {
+        status: 400,
+        headers: {
+          'Content-Type': 'application/json',
+          ...getLocalhostCorsHeaders(),
+        },
+      });
+    }
+    
+    // Valider et forcer les valeurs à être des entiers positifs dans des plages sûres
+    const page = Math.max(0, Math.min(10000, parsedPage)); // Max 10000 pages
+    const limit = Math.max(1, Math.min(100, parsedLimit)); // Limite max à 100
     const offset = page * limit;
+    
+    // Validation finale: s'assurer que offset est un entier sûr
+    if (!Number.isInteger(offset) || offset < 0 || offset > 1000000) {
+      return new Response(JSON.stringify({ 
+        error: 'Invalid pagination parameters' 
+      }), {
+        status: 400,
+        headers: {
+          'Content-Type': 'application/json',
+          ...getLocalhostCorsHeaders(),
+        },
+      });
+    }
 
     const connection = await mysql.createConnection({
       host: '127.0.0.1',
@@ -30,7 +69,9 @@ export async function GET(request) {
     const total = countRows[0]?.total || 0;
 
     // Récupère les utilisateurs avec leurs scores, paginés
-    // Note: LIMIT et OFFSET doivent être des nombres, pas des paramètres préparés
+    // LIMIT et OFFSET sont validés comme entiers sûrs avant utilisation
+    // MySQL ne supporte pas les paramètres préparés pour LIMIT/OFFSET, donc interpolation directe sécurisée
+    // Les valeurs limit et offset sont garanties être des entiers validés (pas d'injection SQL possible)
     const [rows] = await connection.execute(`
       SELECT 
         f.id,
@@ -62,14 +103,22 @@ export async function GET(request) {
       status: 200,
       headers: {
         'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': process.env.ALLOWED_ORIGIN || '*',
+        ...getLocalhostCorsHeaders(),
       },
     });
   } catch (error) {
     console.error('Error fetching leaderboard:', error);
-    return new Response(JSON.stringify({ error: 'Database error' }), {
+    // Ne pas exposer les détails de l'erreur en production
+    const errorMessage = process.env.NODE_ENV === 'production' 
+      ? 'Database error'
+      : error.message;
+    
+    return new Response(JSON.stringify({ error: errorMessage }), {
       status: 500,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        ...getLocalhostCorsHeaders(),
+      },
     });
   }
 }

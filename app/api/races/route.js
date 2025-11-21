@@ -1,9 +1,14 @@
 import mysql from 'mysql2/promise';
-import 'dotenv/config'
+import 'dotenv/config';
+import { validateLocalhost, getLocalhostCorsHeaders } from '../../utils/security';
 
-
-export async function GET() {
+export async function GET(request) {
   try {
+    // Vérifier que la requête provient de localhost
+    const localhostError = validateLocalhost(request);
+    if (localhostError) {
+      return localhostError;
+    }
     const connection = await mysql.createConnection({
       host: '127.0.0.1',
       user: process.env.MYSQL_USER || 'root',
@@ -17,14 +22,21 @@ export async function GET() {
       status: 200,
       headers: {
         'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': process.env.ALLOWED_ORIGIN || '*',
+        ...getLocalhostCorsHeaders(),
       },
     });
   } catch (error) {
     console.error('Error fetching races:', error);
-    return new Response(JSON.stringify({ error: 'Database error' }), {
+    const errorMessage = process.env.NODE_ENV === 'production' 
+      ? 'Database error'
+      : error.message;
+    
+    return new Response(JSON.stringify({ error: errorMessage }), {
       status: 500,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        ...getLocalhostCorsHeaders(),
+      },
     });
   }
 }
