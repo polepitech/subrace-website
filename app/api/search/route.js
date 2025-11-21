@@ -43,7 +43,7 @@ export async function GET() {
 
     const users = rows.map(row => ({
       username: row.username,
-      img: `/api/images/avatars/${row.username.toLowerCase()}.jpg`,
+      img: `/api/images/avatars/${row.username}.jpg`,
       point: parseInt(row.total_points) || 0
     }));
 

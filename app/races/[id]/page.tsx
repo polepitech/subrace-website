@@ -16,6 +16,7 @@ interface Follower {
   username: string;
   img: string;
   point: number;
+  score: number;
 }
 
 export default function RacePage() {
@@ -30,6 +31,7 @@ export default function RacePage() {
   const [currentOffset, setCurrentOffset] = useState(0);
   const [followersMap, setFollowersMap] = useState<{ [key: string]: Follower }>({});
   const [totalPositions, setTotalPositions] = useState<number | null>(null);
+  const [maxGlobalScore, setMaxGlobalScore] = useState<number>(1);
 
   // Charge les followers une seule fois au montage
   useEffect(() => {
@@ -42,8 +44,9 @@ export default function RacePage() {
         followers.forEach((follower: any) => {
           map[follower.username] = {
             username: follower.username,
-            img: `/api/images/avatars/${follower.username.toLowerCase()}.jpg`,
+            img: `/api/images/avatars/${follower.username}.jpg`,
             point: 0,
+            score: parseInt(follower.score) || 0,
           };
         });
         setFollowersMap(map);
@@ -52,6 +55,22 @@ export default function RacePage() {
       }
     };
     fetchFollowers();
+  }, []);
+
+  // Charge le premier score global du leaderboard pour maxPoints
+  useEffect(() => {
+    const fetchMaxScore = async () => {
+      try {
+        const leaderboardResponse = await fetch('/api/leaderboard?page=0&limit=1');
+        const leaderboardData = await leaderboardResponse.json();
+        if (leaderboardData.users && leaderboardData.users.length > 0) {
+          setMaxGlobalScore(leaderboardData.users[0].point || 1);
+        }
+      } catch (error) {
+        console.error('Error fetching max score:', error);
+      }
+    };
+    fetchMaxScore();
   }, []);
 
   // Charge les données de la course
@@ -224,6 +243,7 @@ export default function RacePage() {
             hasIncompleteData={hasIncompleteData}
             onLoadMore={loadMore}
             hasMore={hasMore}
+            maxPoints={maxGlobalScore}
           />
         </div>
       </div>

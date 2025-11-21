@@ -127,10 +127,6 @@ export default function UserStatsPage() {
                     <div className="text-neutral-400 text-sm mb-1">{t('user.stats.podiums')}</div>
                     <div className="text-2xl font-bold text-white">{stats.podiums}</div>
                   </div>
-                  <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4">
-                    <div className="text-neutral-400 text-sm mb-1">{t('user.stats.victories')}</div>
-                    <div className="text-2xl font-bold text-white">{stats.victories}</div>
-                  </div>
                 </div>
 
                 {/* Stats secondaires */}

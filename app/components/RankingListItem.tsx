@@ -8,6 +8,7 @@ interface RankingListItemProps {
   username: string;
   img: string;
   points: number;
+  score?: number;
   position: number;
   maxPoints: number;
   className?: string;
@@ -17,10 +18,14 @@ export default function RankingListItem({
   username, 
   img, 
   points, 
+  score,
   position, 
   maxPoints,
   className = '' 
 }: RankingListItemProps) {
+  // Utilise score si disponible, sinon points (pour compatibilité avec la page principale)
+  const progressValue = score !== undefined ? score : points;
+  
   return (
     <li className={`flex items-center gap-3 md:gap-4 py-2 md:py-3 ${className}`}>
       <PositionBadge position={position} />
@@ -32,7 +37,7 @@ export default function RankingListItem({
         >
           {username}
         </Link>
-        <ProgressBar value={points} max={maxPoints} />
+        <ProgressBar value={progressValue} max={maxPoints} />
       </div>
       <span className="ml-auto">
         <PointsDisplay points={points} variant="default" className="font-semibold" />

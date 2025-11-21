@@ -6,26 +6,53 @@
  * @param position - Position dans la course (1, 2, 3, ...)
  * @returns Total des points (base + bonus si applicable)
  */
-export function calculatePoints(position: number): number {
-  // Points de base : 40000 - position (minimum 0)
-  const basePoints = Math.max(0, 40000 - position);
 
-  // Bonus podium pour les positions 1 à 10
-  const podiumBonuses: { [key: number]: number } = {
-    1: 10000,
-    2: 7000,
-    3: 5000,
-    4: 4000,
-    5: 3000,
-    6: 2000,
-    7: 1500,
-    8: 1000,
-    9: 500,
-    10: 250
+/**
+ * Calcule les points gagnés en fonction d'une position
+ * Basé sur les règles du script calculateLeaderboard.js
+ * 
+ * Points de position: 40,000 - (position - 1) pour les positions 1 à 40,000, 0 pour les autres
+ * Points bonus (top 10):
+ *   - 1er: +30,000
+ *   - 2ème: +20,000
+ *   - 3ème: +10,000
+ *   - 4ème: +8,000
+ *   - 5ème: +6,000
+ *   - 6ème: +5,000
+ *   - 7ème: +4,000
+ *   - 8ème: +3,000
+ *   - 9ème: +2,000
+ *   - 10ème: +1,000
+ * 
+ * @param position - Position dans la course (1 = premier)
+ * @returns Points totaux (position + bonus)
+ */
+export function calculatePoints(position: number): number {
+  const MAX_POSITION_POINTS = 40000;
+  
+  // Points bonus pour le top 10
+  const BONUS_POINTS: { [key: number]: number } = {
+    1: 30000,
+    2: 20000,
+    3: 10000,
+    4: 8000,
+    5: 6000,
+    6: 5000,
+    7: 4000,
+    8: 3000,
+    9: 2000,
+    10: 1000
   };
 
-  const bonus = podiumBonuses[position] || 0;
-
-  return basePoints + bonus;
+  // Points de position
+  let positionPoints = 0;
+  if (position <= MAX_POSITION_POINTS) {
+    positionPoints = MAX_POSITION_POINTS - (position - 1);
+  }
+  
+  // Points bonus pour le top 10
+  const bonusPoints = BONUS_POINTS[position] || 0;
+  
+  return positionPoints + bonusPoints;
 }
 

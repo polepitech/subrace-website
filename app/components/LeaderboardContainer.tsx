@@ -8,6 +8,7 @@ interface Follower {
   username: string;
   img: string;
   point: number;
+  score?: number;
 }
 
 interface LeaderboardContainerProps {
@@ -17,6 +18,7 @@ interface LeaderboardContainerProps {
   loading?: boolean;
   onLoadMore?: () => void;
   hasMore?: boolean;
+  maxPoints?: number;
 }
 
 export default function LeaderboardContainer({ 
@@ -25,11 +27,12 @@ export default function LeaderboardContainer({
   hasIncompleteData = false, 
   loading = false,
   onLoadMore,
-  hasMore = false
+  hasMore = false,
+  maxPoints: maxPointsProp
 }: LeaderboardContainerProps) {
   const topThree = ranking.slice(0, 3);
   const rest = ranking.slice(3); // Affiche tout le reste (plus de slice local)
-  const maxPoints = ranking[0]?.point || 1;
+  const maxPoints = maxPointsProp || ranking[0]?.point || 1;
 
   return (
     <div className={`relative z-10 md:flex md:gap-8 md:px-8 lg:px-12 md:mt-8 flex-1 min-h-0 mb-20 ${className}`}>

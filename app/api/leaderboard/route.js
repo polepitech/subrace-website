@@ -23,40 +23,22 @@ export async function GET(request) {
 
     // Calcule le total d'utilisateurs avec des points
     const [countRows] = await connection.execute(`
-      SELECT COUNT(DISTINCT f.id) as total
+      SELECT COUNT(*) as total
       FROM followers f
-      INNER JOIN follower_positions fp ON f.id = fp.followers_id
+      WHERE f.score > 0
     `);
     const total = countRows[0]?.total || 0;
 
-    // Récupère les utilisateurs avec leurs points totaux, paginés
+    // Récupère les utilisateurs avec leurs scores, paginés
     // Note: LIMIT et OFFSET doivent être des nombres, pas des paramètres préparés
     const [rows] = await connection.execute(`
       SELECT 
         f.id,
         f.username,
-        SUM(CASE 
-          WHEN fp.position <= 10 THEN 
-            GREATEST(0, 40000 - fp.position) + 
-            CASE fp.position
-              WHEN 1 THEN 10000 
-              WHEN 2 THEN 7000 
-              WHEN 3 THEN 5000
-              WHEN 4 THEN 4000 
-              WHEN 5 THEN 3000 
-              WHEN 6 THEN 2000
-              WHEN 7 THEN 1500 
-              WHEN 8 THEN 1000 
-              WHEN 9 THEN 500
-              WHEN 10 THEN 250 
-              ELSE 0 
-            END
-          ELSE GREATEST(0, 40000 - fp.position)
-        END) as total_points
+        f.score
       FROM followers f
-      INNER JOIN follower_positions fp ON f.id = fp.followers_id
-      GROUP BY f.id, f.username
-      ORDER BY total_points DESC, f.username ASC
+      WHERE f.score > 0
+      ORDER BY f.score DESC, f.username ASC
       LIMIT ${limit} OFFSET ${offset}
     `);
 
@@ -66,8 +48,8 @@ export async function GET(request) {
 
     const users = rows.map(row => ({
       username: row.username,
-      img: `/api/images/avatars/${row.username.toLowerCase()}.jpg`,
-      point: parseInt(row.total_points) || 0
+      img: `/api/images/avatars/${row.username}.jpg`,
+      point: parseInt(row.score) || 0
     }));
 
     return new Response(JSON.stringify({

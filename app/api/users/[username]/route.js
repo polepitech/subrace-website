@@ -132,7 +132,7 @@ export async function GET(request, { params }) {
       follower: {
         id: follower.id,
         username: follower.username,
-        img: `/api/images/avatars/${follower.username.toLowerCase()}.jpg`
+        img: `/api/images/avatars/${follower.username}.jpg`
       },
       stats: {
         totalRaces,

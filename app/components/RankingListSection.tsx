@@ -8,6 +8,7 @@ interface Follower {
   username: string;
   img: string;
   point: number;
+  score?: number;
 }
 
 interface RankingListSectionProps {
@@ -112,6 +113,7 @@ export default function RankingListSection({
                 username={follower.username}
                 img={follower.img}
                 points={follower.point}
+                score={follower.score}
                 position={position}
                 maxPoints={maxPoints}
               />
