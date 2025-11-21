@@ -9,11 +9,14 @@ import BackgroundEffects from '../../components/BackgroundEffects';
 import Navbar from '../../components/Navbar';
 import Avatar from '../../components/Avatar';
 import { calculatePoints } from '../../utils/calculatePoints';
+import { generateRaceNameWithPrefix } from '../../utils/generateRaceName';
 
 interface RaceResult {
   race_id: number;
   position: number;
-  race_name: string | null;
+  race_id_full: number;
+  race_day?: string | number | null;
+  race_type?: string | null;
 }
 
 interface UserStats {
@@ -168,7 +171,11 @@ export default function UserStatsPage() {
                           {medal && <span className="text-2xl">{medal}</span>}
                           <div className="flex-1 min-w-0">
                             <div className="text-white font-medium truncate">
-                              {race.race_name || `Course #${race.race_id}`}
+                              {generateRaceNameWithPrefix({ 
+                                id: race.race_id_full, 
+                                day: race.race_day, 
+                                type: race.race_type 
+                              }, t)}
                             </div>
                           </div>
                         </div>

@@ -5,10 +5,12 @@ import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import Navbar from '../components/Navbar';
 import Avatar from '../components/Avatar';
+import { generateRaceNameWithPrefix } from '../utils/generateRaceName';
 
 interface Race {
   id: number;
   day: string;
+  type?: string;
   date?: string;
   winner?: string;
   second?: string;
@@ -64,7 +66,7 @@ export default function RacesPage() {
                 className="block rounded-xl sm:rounded-2xl bg-white/5 backdrop-blur-sm p-4 sm:p-6 hover:bg-white/10 transition-colors"
               >
                 <h2 className="text-lg sm:text-xl font-bold text-white mb-3 sm:mb-4">
-                  {t('races.race')} #{race.day}
+                  {generateRaceNameWithPrefix(race, t)}
                 </h2>
 
                 

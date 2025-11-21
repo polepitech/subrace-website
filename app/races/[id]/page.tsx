@@ -10,6 +10,7 @@ import LeaderboardContainer from '../../components/LeaderboardContainer';
 import LeaderboardContainerSkeleton from '../../components/skeleton/LeaderboardContainerSkeleton';
 import Navbar from '../../components/Navbar';
 import { calculatePoints } from '../../utils/calculatePoints';
+import { generateRaceNameWithPrefix } from '../../utils/generateRaceName';
 import Head from 'next/head';
 
 interface Follower {
@@ -88,7 +89,7 @@ export default function RacePage() {
           return;
         }
 
-        setRaceName(raceData.day || `Course #${raceId}`);
+        setRaceName(generateRaceNameWithPrefix({ id: parseInt(raceId), day: raceData.day, type: raceData.type }, t));
         setTotalPositions(raceData.total || null);
 
         // Vérifie si on a des positions complètes ou seulement le podium

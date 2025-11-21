@@ -21,6 +21,8 @@
     "noData": "No data available for this race",
     "results": "Race results",
     "race": "Race",
+    "weekRace": "Week Race",
+    "equalChance": "Equal Chance",
     "storedData": "stored data for this race"
   },
   "user": {

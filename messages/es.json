@@ -21,6 +21,8 @@
     "noData": "No hay datos disponibles para esta carrera",
     "results": "Resultados de la carrera",
     "race": "Carrera",
+    "weekRace": "Carrera de la Semana",
+    "equalChance": "Oportunidad Igual",
     "storedData": "datos almacenados para esta carrera"
   },
   "user": {

@@ -65,16 +65,27 @@ export async function GET(request, { params }) {
       SELECT 
         fp.race_id,
         fp.position,
-        r.day as race_name
+        r.id,
+        r.day,
+        r.type
       FROM follower_positions fp
       INNER JOIN races r ON fp.race_id = r.id
       WHERE fp.followers_id = ?
       ORDER BY fp.race_id DESC
     `, [follower.id]);
 
+    // Retourne les données brutes pour que le front puisse générer le nom
+    const positionsWithRaceData = positions.map(pos => ({
+      race_id: pos.race_id,
+      position: pos.position,
+      race_id_full: pos.id,
+      race_day: pos.day,
+      race_type: pos.type
+    }));
+
     // Calcule les statistiques
-    const totalRaces = positions.length;
-    const totalPoints = positions.reduce((sum, pos) => {
+    const totalRaces = positionsWithRaceData.length;
+    const totalPoints = positionsWithRaceData.reduce((sum, pos) => {
       // Points de base : 40000 - position
       const basePoints = Math.max(0, 40000 - pos.position);
       // Bonus podium
@@ -86,11 +97,11 @@ export async function GET(request, { params }) {
       return sum + basePoints + bonus;
     }, 0);
 
-    const podiums = positions.filter(p => p.position <= 3).length;
-    const victories = positions.filter(p => p.position === 1).length;
-    const bestPosition = positions.length > 0 ? Math.min(...positions.map(p => p.position)) : null;
-    const averagePosition = positions.length > 0 
-      ? positions.reduce((sum, p) => sum + p.position, 0) / positions.length 
+    const podiums = positionsWithRaceData.filter(p => p.position <= 3).length;
+    const victories = positionsWithRaceData.filter(p => p.position === 1).length;
+    const bestPosition = positionsWithRaceData.length > 0 ? Math.min(...positionsWithRaceData.map(p => p.position)) : null;
+    const averagePosition = positionsWithRaceData.length > 0 
+      ? positionsWithRaceData.reduce((sum, p) => sum + p.position, 0) / positionsWithRaceData.length 
       : null;
 
     // Calcule le rang global
@@ -149,7 +160,7 @@ export async function GET(request, { params }) {
         averagePosition: averagePosition ? Math.round(averagePosition * 10) / 10 : null,
         globalRank: globalRank > 0 ? globalRank : null
       },
-      races: positions
+      races: positionsWithRaceData
     };
 
     return new Response(JSON.stringify(result), {
