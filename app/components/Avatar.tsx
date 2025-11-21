@@ -52,6 +52,20 @@ export default function Avatar({ src, alt, size = 'md', className = '', ring = '
       return;
     }
 
+    // Vérifier localStorage pour limiter les appels à une fois toutes les 30 secondes
+    const storageKey = `instagram_avatar_last_fetch_${alt}`;
+    const lastFetchTime = localStorage.getItem(storageKey);
+    const now = Date.now();
+    const thirtySeconds = 30 * 1000;
+
+    if (lastFetchTime) {
+      const timeSinceLastFetch = now - parseInt(lastFetchTime, 10);
+      if (timeSinceLastFetch < thirtySeconds) {
+        // Moins de 30 secondes se sont écoulées, ne pas appeler l'API
+        return;
+      }
+    }
+
     setIsLoading(true);
     setHasTriedFetch(true);
 
@@ -59,13 +73,23 @@ export default function Avatar({ src, alt, size = 'md', className = '', ring = '
       // Appeler l'API pour télécharger depuis Instagram
       const response = await fetch(`/api/fetch-instagram-avatar?username=${encodeURIComponent(alt)}`);
       
+      // Mettre à jour le timestamp dans localStorage
+      localStorage.setItem(storageKey, now.toString());
+      
       if (response.ok) {
         // Réinitialiser l'état d'erreur et recharger l'image avec un timestamp
         setImageError(false);
         const newSrc = `${src.split('?')[0]}?t=${Date.now()}`;
         setImageSrc(newSrc);
       } else {
-        console.error('Failed to fetch Instagram avatar:', await response.text());
+        const errorText = await response.text();
+        console.error('Failed to fetch Instagram avatar:', errorText);
+        
+        // Si c'est une erreur de rate limit (429), ne pas réessayer
+        if (response.status === 429) {
+          // Mettre à jour le timestamp même en cas d'erreur pour respecter le rate limit
+          localStorage.setItem(storageKey, now.toString());
+        }
       }
     } catch (error) {
       console.error('Error fetching Instagram avatar:', error);
