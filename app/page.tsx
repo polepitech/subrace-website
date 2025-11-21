@@ -7,7 +7,6 @@ import BackgroundEffects from './components/BackgroundEffects';
 import LeaderboardContainer from './components/LeaderboardContainer';
 import Navbar from './components/Navbar';
 import SearchBar from './components/SearchBar';
-import HeaderSkeleton from './components/skeleton/HeaderSkeleton';
 import LeaderboardContainerSkeleton from './components/skeleton/LeaderboardContainerSkeleton';
 
 interface Follower {

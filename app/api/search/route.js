@@ -16,7 +16,7 @@ export async function GET(request) {
     const hasPagination = searchParams.has('page') || searchParams.has('limit');
     
     let page = 0;
-    let limit = 10000; // Limite très élevée pour retourner tous les utilisateurs
+    let limit = 1000000; // Limite très élevée pour retourner tous les utilisateurs
     let offset = 0;
     
     if (hasPagination) {
