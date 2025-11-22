@@ -1,8 +1,8 @@
-import mysql from 'mysql2/promise';
-import 'dotenv/config';
+import pool from '../../../lib/db';
 import { validateLocalhost, getLocalhostCorsHeaders } from '../../../utils/security';
 
 export async function GET(request, { params }) {
+  let connection;
   try {
     // Vérifier que la requête provient de localhost
     const localhostError = validateLocalhost(request);
@@ -37,12 +37,7 @@ export async function GET(request, { params }) {
 
     const username = rawUsername;
 
-    const connection = await mysql.createConnection({
-      host: '127.0.0.1',
-      user: process.env.MYSQL_USER || 'root',
-      password: process.env.MYSQL_PASSWORD || '',
-      database: 'SubRace'
-    });
+    const connection = await pool.getConnection();
 
     // Récupère les informations du follower
     const [followerRows] = await connection.execute(
@@ -51,7 +46,7 @@ export async function GET(request, { params }) {
     );
 
     if (followerRows.length === 0) {
-      await connection.end();
+      connection.release();
       return new Response(JSON.stringify({ error: 'User not found' }), {
         status: 404,
         headers: { 'Content-Type': 'application/json' },
@@ -112,7 +107,7 @@ export async function GET(request, { params }) {
       ? rankRows[0].count + 1 
       : null;
 
-    await connection.end();
+    connection.release();
 
     const result = {
       follower: {
@@ -152,6 +147,10 @@ export async function GET(request, { params }) {
         ...getLocalhostCorsHeaders(),
       },
     });
+  } finally {
+    if (connection) {
+      connection.release();
+    }
   }
 }
 

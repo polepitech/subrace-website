@@ -1,20 +1,15 @@
-import mysql from 'mysql2/promise';
-import 'dotenv/config';
+import pool from '../../lib/db';
 import { validateLocalhost, getLocalhostCorsHeaders } from '../../utils/security';
 
 export async function GET(request) {
+  let connection;
   try {
     // Vérifier que la requête provient de localhost
     const localhostError = validateLocalhost(request);
     if (localhostError) {
       return localhostError;
     }
-    const connection = await mysql.createConnection({
-      host: '127.0.0.1',
-      user: process.env.MYSQL_USER || 'root',
-      password: process.env.MYSQL_PASSWORD || '',
-      database: 'SubRace'
-    });
+    connection = await pool.getConnection();
 
     const [rows] = await connection.execute('SELECT * FROM races ORDER BY created_at DESC');
 
@@ -38,6 +33,10 @@ export async function GET(request) {
         ...getLocalhostCorsHeaders(),
       },
     });
+  } finally {
+    if (connection) {
+      connection.release();
+    }
   }
 }
 

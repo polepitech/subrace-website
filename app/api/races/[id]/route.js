@@ -1,8 +1,8 @@
-import mysql from 'mysql2/promise';
-import 'dotenv/config';
+import pool from '../../../lib/db';
 import { validateLocalhost, getLocalhostCorsHeaders } from '../../../utils/security';
 
 export async function GET(request, { params }) {
+  let connection;
   try {
     // Vérifier que la requête provient de localhost
     const localhostError = validateLocalhost(request);
@@ -39,12 +39,7 @@ export async function GET(request, { params }) {
     const startPosition = offset + 1;
     const endPosition = offset + limit;
 
-    const connection = await mysql.createConnection({
-      host: '127.0.0.1',
-      user: process.env.MYSQL_USER || 'root',
-      password: process.env.MYSQL_PASSWORD || '',
-      database: 'SubRace'
-    });
+    const connection = await pool.getConnection();
 
     // Récupère les informations de la course
     const [raceRows] = await connection.execute(
@@ -53,7 +48,7 @@ export async function GET(request, { params }) {
     );
 
     if (raceRows.length === 0) {
-      await connection.end();
+      connection.release();
       return new Response(JSON.stringify({ error: 'Race not found' }), {
         status: 404,
         headers: { 'Content-Type': 'application/json' },
@@ -80,7 +75,7 @@ export async function GET(request, { params }) {
       ORDER BY fp.position
     `, [raceId, startPosition, endPosition]);
 
-    await connection.end();
+    connection.release();
 
     const race = raceRows[0];
     const hasMore = offset + limit < total;
@@ -114,6 +109,10 @@ export async function GET(request, { params }) {
         ...getLocalhostCorsHeaders(),
       },
     });
+  } finally {
+    if (connection) {
+      connection.release();
+    }
   }
 }
 

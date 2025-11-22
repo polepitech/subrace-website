@@ -1,8 +1,8 @@
-import mysql from 'mysql2/promise';
-import 'dotenv/config';
+import pool from '../../lib/db';
 import { validateLocalhost, getLocalhostCorsHeaders } from '../../utils/security';
 
 export async function GET(request) {
+  let connection;
   try {
     // Vérifier que la requête provient de localhost
     const localhostError = validateLocalhost(request);
@@ -53,12 +53,7 @@ export async function GET(request) {
       });
     }
 
-    const connection = await mysql.createConnection({
-      host: '127.0.0.1',
-      user: process.env.MYSQL_USER || 'root',
-      password: process.env.MYSQL_PASSWORD || '',
-      database: 'SubRace'
-    });
+    connection = await pool.getConnection();
 
     // Calcule le total d'utilisateurs avec des points
     const [countRows] = await connection.execute(`
@@ -83,7 +78,7 @@ export async function GET(request) {
       LIMIT ${limit} OFFSET ${offset}
     `);
 
-    await connection.end();
+    connection.release();
 
     const hasMore = offset + limit < total;
 
@@ -120,6 +115,10 @@ export async function GET(request) {
         ...getLocalhostCorsHeaders(),
       },
     });
+  } finally {
+    if (connection) {
+      connection.release();
+    }
   }
 }
 
