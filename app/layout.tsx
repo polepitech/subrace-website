@@ -39,7 +39,7 @@ export default async function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <LocaleProvider initialMessages={messages} initialLocale={defaultLocale}>
-            <GoogleAnalytics gaId="GTM-P6C3DZVT" />
+            <GoogleAnalytics gaId="GTM-5ZC4ZZZK" />
           {children}
         </LocaleProvider>
       </body>
