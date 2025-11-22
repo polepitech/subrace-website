@@ -81,6 +81,7 @@ export default function RacesPage() {
                         alt={race.winner} 
                         size="md"
                         className="mb-1"
+                        noLink={true}
                       />
                       <p className="text-xs sm:text-sm md:text-lg lg:text-xl text-neutral-300 text-center truncate w-full px-1">
                         🥇 {race.winner}
@@ -95,6 +96,7 @@ export default function RacesPage() {
                         alt={race.second} 
                         size="md"
                         className="mb-1"
+                        noLink={true}
                       />
                       <p className="text-xs sm:text-sm md:text-lg lg:text-xl text-neutral-300 text-center truncate w-full px-1">
                         🥈 {race.second}
@@ -110,6 +112,7 @@ export default function RacesPage() {
                         alt={race.third} 
                         size="md"
                         className="mb-1"
+                        noLink={true}
                       />
                       <p className="text-xs sm:text-sm md:text-lg lg:text-xl text-neutral-300 text-center truncate w-full px-1">
                         🥉 {race.third}

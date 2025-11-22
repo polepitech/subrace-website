@@ -28,7 +28,6 @@ export function generateRaceNameWithPrefix(
   } else { //normal
     raceType = t('races.race');
   }
-console.log(race)
   
   return `${raceType} #${race.day}`;
 }

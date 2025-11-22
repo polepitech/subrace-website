@@ -85,17 +85,8 @@ export async function GET(request, { params }) {
 
     // Calcule les statistiques
     const totalRaces = positionsWithRaceData.length;
-    const totalPoints = positionsWithRaceData.reduce((sum, pos) => {
-      // Points de base : 40000 - position
-      const basePoints = Math.max(0, 40000 - pos.position);
-      // Bonus podium
-      const podiumBonuses = {
-        1: 10000, 2: 7000, 3: 5000, 4: 4000, 5: 3000,
-        6: 2000, 7: 1500, 8: 1000, 9: 500, 10: 250
-      };
-      const bonus = podiumBonuses[pos.position] || 0;
-      return sum + basePoints + bonus;
-    }, 0);
+    // Utilise directement le score stocké dans la table followers
+    const totalPoints = parseInt(follower.score) || 0;
 
     const podiums = positionsWithRaceData.filter(p => p.position <= 3).length;
     const victories = positionsWithRaceData.filter(p => p.position === 1).length;
@@ -104,44 +95,22 @@ export async function GET(request, { params }) {
       ? positionsWithRaceData.reduce((sum, p) => sum + p.position, 0) / positionsWithRaceData.length 
       : null;
 
-    // Calcule le rang global
-    // Récupère toutes les positions de tous les followers
-    const [allPositions] = await connection.execute(`
-      SELECT 
-        fp.followers_id,
-        fp.position,
-        f.username
-      FROM follower_positions fp
-      INNER JOIN followers f ON fp.followers_id = f.id
-    `);
-
-    // Calcule les points pour chaque follower
-    const followersPoints = {};
-    allPositions.forEach((pos) => {
-      if (!followersPoints[pos.username]) {
-        followersPoints[pos.username] = 0;
-      }
-      // Points de base : 40000 - position
-      const basePoints = Math.max(0, 40000 - pos.position);
-      // Bonus podium
-      const podiumBonuses = {
-        1: 10000, 2: 7000, 3: 5000, 4: 4000, 5: 3000,
-        6: 2000, 7: 1500, 8: 1000, 9: 500, 10: 250
-      };
-      const bonus = podiumBonuses[pos.position] || 0;
-      followersPoints[pos.username] += basePoints + bonus;
-    });
-
-    // Trie par points décroissants, puis par username
-    const sortedUsers = Object.entries(followersPoints).sort((a, b) => {
-      if (b[1] !== a[1]) {
-        return b[1] - a[1];
-      }
-      return a[0].localeCompare(b[0], 'fr', { sensitivity: 'base' });
-    });
-
-    // Trouve le rang de l'utilisateur actuel
-    const globalRank = sortedUsers.findIndex(([username]) => username === follower.username) + 1;
+    // Calcule le rang global en utilisant le même tri que /api/leaderboard
+    // Compte les utilisateurs qui ont un score supérieur OU le même score mais un username qui vient avant
+    // Filtre uniquement les utilisateurs avec score > 0 comme dans /api/leaderboard
+    const [rankRows] = await connection.execute(`
+      SELECT COUNT(*) as count
+      FROM followers f
+      WHERE f.score > 0
+        AND (f.score > ? 
+         OR (f.score = ? AND f.username < ?))
+    `, [follower.score, follower.score, follower.username]);
+    
+    // Si l'utilisateur a un score > 0, son rang est le nombre d'utilisateurs avant lui + 1
+    // Sinon, il n'est pas dans le classement
+    const globalRank = (parseInt(follower.score) || 0) > 0 && rankRows[0]?.count !== undefined 
+      ? rankRows[0].count + 1 
+      : null;
 
     await connection.end();
 
@@ -158,7 +127,7 @@ export async function GET(request, { params }) {
         victories,
         bestPosition,
         averagePosition: averagePosition ? Math.round(averagePosition * 10) / 10 : null,
-        globalRank: globalRank > 0 ? globalRank : null
+        globalRank: globalRank
       },
       races: positionsWithRaceData
     };

@@ -24,7 +24,7 @@ export default function PodiumCard({ username, img, points, position, className 
         <div className="absolute -top-0 -right-3 md:relative md:top-0 md:right-0">
           <MedalIcon position={position} />
         </div>
-        <Avatar src={img} alt={username} size="md" ring={ringClasses[position as keyof typeof ringClasses]} />
+        <Avatar src={img} alt={username} size="md" ring={ringClasses[position as keyof typeof ringClasses]} noLink={true} />
         <div className="md:flex-1">
           <Link 
             href={`/users/${encodeURIComponent(username)}`}

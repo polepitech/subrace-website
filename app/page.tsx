@@ -19,32 +19,39 @@ export default function HomePage() {
   const t = useTranslations('home');
   const [ranking, setRanking] = useState<Follower[]>([]);
   const [allUsers, setAllUsers] = useState<Follower[]>([]); // Pour SearchBar
-  const [loading, setLoading] = useState(true);
+  const [loadingLeaderboard, setLoadingLeaderboard] = useState(true);
+  const [loadingSearch, setLoadingSearch] = useState(true);
   const [hasMore, setHasMore] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
 
   // Charge la première page au montage
   useEffect(() => {
     const fetchInitialData = async () => {
+      // Charge la première page du leaderboard
       try {
-        // Charge la première page du leaderboard
         const leaderboardResponse = await fetch('/api/leaderboard?page=0&limit=25');
         const leaderboardData = await leaderboardResponse.json();
         
         setRanking(leaderboardData.users);
         setHasMore(leaderboardData.hasMore);
         setCurrentPage(0);
+        setLoadingLeaderboard(false);
+      } catch (error) {
+        console.error('Error fetching leaderboard:', error);
+        setLoadingLeaderboard(false);
+      }
 
         // Charge tous les utilisateurs pour la recherche (sans pagination = tous les utilisateurs)
+      try {
         const searchResponse = await fetch('/api/search');
         const searchUsers = await searchResponse.json();
         // Si pas de pagination, l'API retourne directement un tableau
         // Sinon, c'est un objet { users, total, page, limit, hasMore }
         setAllUsers(Array.isArray(searchUsers) ? searchUsers : (searchUsers.users || []));
+        setLoadingSearch(false);
       } catch (error) {
-        console.error('Error fetching data:', error);
-      } finally {
-        setLoading(false);
+        console.error('Error fetching search data:', error);
+        setLoadingSearch(false);
       }
     };
 
@@ -68,7 +75,7 @@ export default function HomePage() {
     }
   };
 
-  if (loading) {
+  if (loadingLeaderboard) {
     return (
       <div className="flex flex-col min-h-screen bg-neutral-900">
         <Navbar />
